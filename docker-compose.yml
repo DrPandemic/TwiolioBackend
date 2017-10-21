@@ -1,0 +1,21 @@
+version: "3"
+services:
+  build:
+    image: node:boron-wheezy
+    volumes:
+      - "./:${PWD}/"
+    command: bash -c "cd ${PWD} && npm install && npm run watch"
+  functions:
+    image: runixo/google-cloud-functions-emulator
+    command: bash -c "functions-emulator start && tail -f /usr/local/lib/node_modules/@google-cloud/functions-emulator/logs/cloud-functions-emulator.log"
+    volumes:
+      - "./lib/:/src/app/"
+    ports:
+      - 8010:8010
+  database:
+    image: singularities/datastore-emulator
+    environment:
+      - "DATASTORE_PROJECT_ID=${PROJECT_ID}"
+      - DATASTORE_LISTEN_ADDRESS=0.0.0.0:8081
+    ports:
+      - "8081:8081"
